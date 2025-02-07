@@ -1,27 +1,42 @@
-pub fn create_greeting(name: &str) -> String {
-    format!("Hello, {}!", name)
+use inverted_index::InvertedIndex;
+use std::io::{self, Write};
+
+fn get_input(prompt: &str) -> io::Result<String> {
+    print!("{}", prompt);
+    io::stdout().flush()?;
+    
+    let mut input = String::new();
+    io::stdin().read_line(&mut input)?;
+    Ok(input.trim().to_string())
 }
 
 fn main() {
-    println!("What's your name?");
+    let mut index = InvertedIndex::new();
     
-    let mut input = String::new(); // creates an empty string to store input
+    // Add some initial documents
+    index.add_document(1, "The quick brown fox");
+    index.add_document(2, "The brown dog");
+    
+    loop {
+        match get_input("\nEnter a word to search (or 'quit' to exit): ") {
+            Ok(input) => {
+                if input == "quit" {
+                    println!("Goodbye!");
+                    break;
+                }
 
-    let stdin = std::io::stdin(); // standar input handler
-
-    let result = stdin.read_line(&mut input);
-
-    match result {
-        Ok(_number_of_bytes_read) => { // _number_of_bytes_read because when read_line it returns the  number of bytes that were read
-            // _ in fron of a var is rust is we won't use it
-            println!("{}", create_greeting(input.trim()));
-        }
-        Err(error) => { // => is used to separate the pattern from the code in match
-            println!("Failed to read line: {}", error)
+                let results = index.search(&input);
+                
+                if results.is_empty() {
+                    println!("No documents found containing '{}'", input);
+                } else {
+                    println!("Documents containing '{}': {:?}", input, results);
+                }
+            }
+            Err(error) => {
+                eprintln!("Error reading input: {}", error);
+                break;
+            }
         }
     }
-    // Efficient way: 
-    //std::io::stdin()
-    //     .read_line(&mut input)
-    //     .expect("Failed to read line");
 }
