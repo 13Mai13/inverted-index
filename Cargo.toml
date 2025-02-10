@@ -3,11 +3,6 @@ name = "inverted_index"
 version = "0.1.0"
 edition = "2021"
 
-[lib]
-name = "inverted_index"
-# "cdylib" is necessary for Python modules
-crate-type = ["cdylib"]
-
 [dependencies]
 pyo3 = { version = "0.19", features = ["extension-module"] }
 serde = { version = "1.0", features = ["derive"] }
